@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding-left: 1vw;
+            padding-right: 1vw;
+        }
+
+        input{
+            width: 8vw;
+        }
+
+    </style>
+    <title>Movie Ratings</title>
+</head>
+<body>
+    <form action="" id="movie-form">
+        <input class="movie-input" type="text" placeholder="Enter Movie Title">
+        <input class="rating-input" type="number" min="0" max="10" placeholder="Enter Rating (0 - 10)">
+    </form>
+    <button id="submit">Submit</button>
+    
+<table>
+    <tbody>
+        <tr>
+        <th>Title</th>
+        <th>Rating</th>
+        <th>Delete</th>
+        </tr>
+    </tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<!-- I know this is bad practice but for sake of ease for reviewing I'll put the script here -->
+<script>
+    let movieTableInfo = [];
+
+    $('#submit').on('click', addMovie);
+
+    $('table').on('click', '.remove', function(){
+        $(this).closest('tr').remove();
+    });
+
+    function addMovie(){
+        let movieName = $('.movie-input').val();
+        let movieRating = $('.rating-input').val();
+
+        if(movieName.length < 2){
+            alert('Movie must have at least two characters');
+            return;
+        }
+        if(movieRating < 0 || movieRating > 10){
+            alert('Movie rating must be between 0 and 10');
+            return;
+        }
+        $('table').append('<tr>');
+        $('tr:last-child').append(
+            `<td>${movieName}</td>
+            <td>${movieRating}</td>
+            <td>
+                <button class='remove'>Remove</button>
+            </td>`
+        );
+        
+        $('#movie-form').trigger('reset');
+    };
+
+    $('th').on('click', function(){
+        let table = $(this).parents('table').eq(0);
+        let rows = table.find('tr:gt(0)').toArray().sort(compare($(this).index()));
+
+        this.asc = !this.asc;
+        if (!this.asc){
+            rows = rows.reverse();
+        }
+        for (row of rows){
+            table.append(row);
+        }
+    });
+
+    function compare(i) {
+        return function(a, b) {
+            let valA = getMovieInfo(a, i);
+            let valB = getMovieInfo(b, i);
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+        }
+    }
+
+    function getMovieInfo(row, index){
+        return $(row).children('td').eq(index).text()
+    } //Mentor and I found similar solution on stack overflow. Walked through it so I understand it for implementing in this app.
+
+    </script>
+</body>
+</html>
